@@ -1,0 +1,18 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /participants/{uid}/{participantId}/{fileName=**} {
+      // Fotos ficam visíveis junto das listas públicas.
+      allow read: if true;
+
+      // Só o dono do cadastro pode enviar imagens para sua própria pasta.
+      allow create, update: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource != null
+        && request.resource.size <= 2 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp|gif)');
+
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}

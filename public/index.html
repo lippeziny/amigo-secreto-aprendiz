@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f1f9">
+  <meta name="description" content="Organize seu Amigo Secreto: participe, escolha presentes da lista do seu amigo e mantenha a surpresa.">
+  <title>Amigo Secreto — lista de desejos</title>
+  <meta name="color-scheme" content="light">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/config.js"></script>
+  <script type="module" src="/firebase.js"></script>
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#inicio" aria-label="Amigo Secreto, início">
+      <span class="brand-mark" aria-hidden="true">✳</span>
+      <span>amigo secreto</span>
+    </a>
+    <a class="topbar-link" href="#participantes">Ver participantes <span aria-hidden="true">↓</span></a>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="hero-decoration decoration-left" aria-hidden="true">✦</div>
+      <div class="hero-decoration decoration-right" aria-hidden="true">✳</div>
+      <div class="hero-content">
+        <p class="eyebrow"><span class="eyebrow-line"></span> É tempo de celebrar <span class="eyebrow-line"></span></p>
+        <div class="gift-icon" aria-hidden="true">
+          <svg viewBox="0 0 88 88" fill="none">
+            <path d="M44 24v52M15 39h58v37H15zM10 27h68v13H10z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M44 27c-18 0-24-7-20-15 4-8 18-2 20 15Zm0 0c18 0 24-7 20-15-4-8-18-2-20 15Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h1>Amigo<br><span>Secreto</span></h1>
+        <p class="hero-subtitle">Um presente, muitos sorrisos e uma surpresa especial.</p>
+
+        <div class="minimum-card">
+          <span class="minimum-label">VALOR MÍNIMO DO PRESENTE</span>
+          <div class="minimum-price"><span>R$</span><strong id="minimum-value">70</strong><span>,00</span></div>
+          <span class="minimum-note">Esse é o valor mínimo combinado para a brincadeira.</span>
+        </div>
+
+        <a class="primary-button hero-button" href="#participantes">Quero participar <span aria-hidden="true">↗</span></a>
+        <a class="scroll-hint" href="#participantes"><span class="scroll-dot"></span> role para conhecer os participantes</a>
+      </div>
+      <div class="hero-bottom-label" aria-hidden="true">UMA BRINCADEIRA FEITA DE CARINHO</div>
+    </section>
+
+    <section class="participants-section" id="participantes">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">NOSSA TURMA</p>
+          <h2>Quem vai participar<span class="heading-period">?</span></h2>
+          <p class="section-description">Abra a lista de cada pessoa, escolha um ou mais presentes e veja a soma dos preços médios.</p>
+        </div>
+        <div class="participant-counter" aria-label="Quantidade de participantes">
+          <strong id="participant-count">0</strong>
+          <span>participantes</span>
+        </div>
+      </div>
+
+      <div id="participants-grid" class="participants-grid" aria-live="polite"></div>
+
+      <div class="join-panel">
+        <div class="join-copy">
+          <span class="join-sparkle" aria-hidden="true">✳</span>
+          <div>
+            <h3>Está faltando você!</h3>
+            <p>Entre para a brincadeira e monte sua própria lista de desejos.</p>
+          </div>
+        </div>
+        <button class="primary-button join-button" id="open-form-button" type="button">Participar <span aria-hidden="true">↗</span></button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a class="brand footer-brand" href="#inicio"><span class="brand-mark" aria-hidden="true">✳</span><span>amigo secreto</span></a>
+    <p>Feito para compartilhar carinho. <span aria-hidden="true">♥</span></p>
+  </footer>
+
+  <dialog class="modal" id="participant-modal" aria-labelledby="form-title">
+    <div class="modal-shell">
+      <div class="modal-header">
+        <div>
+          <p class="section-kicker" id="form-kicker">FAÇA PARTE DA BRINCADEIRA</p>
+          <h2 id="form-title">Sua lista de desejos</h2>
+          <p class="modal-intro" id="form-intro">Preencha seus dados e adicione um ou mais presentes que gostaria de ganhar.</p>
+        </div>
+        <button class="close-button" id="close-form-button" type="button" aria-label="Fechar formulário">×</button>
+      </div>
+
+      <form id="participant-form" enctype="multipart/form-data">
+        <div class="form-field">
+          <label for="participant-name">Seu nome <span class="required">*</span></label>
+          <input id="participant-name" name="name" type="text" maxlength="60" placeholder="Como podemos te chamar?" autocomplete="name" required>
+        </div>
+
+        <div class="form-field">
+          <div class="label-row"><label for="profile-photo">Sua foto de perfil <span class="optional">(opcional)</span></label><span class="small-limit">1 foto · 2 MB</span></div>
+          <label class="upload-area" for="profile-photo">
+            <span class="upload-icon" aria-hidden="true">☺</span>
+            <span><strong>Escolher uma foto sua</strong><small>JPG, PNG, WEBP ou GIF</small></span>
+          </label>
+          <input class="visually-hidden" id="profile-photo" name="profile_photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+          <div id="profile-photo-preview" class="photo-preview"></div>
+          <label class="remove-profile-row" id="remove-profile-row" hidden><input id="remove-profile-photo" type="checkbox"> Remover minha foto atual</label>
+        </div>
+
+        <div class="form-field">
+          <div class="label-row item-section-label">
+            <label>O que você gostaria de ganhar? <span class="required">*</span></label>
+            <span class="small-limit">até 20 itens</span>
+          </div>
+          <div id="items-editor" class="items-editor"></div>
+          <button class="text-button add-item-button" id="add-item-button" type="button">＋ Adicionar outro presente</button>
+          <div class="field-hint">Adicione cada opção separadamente, com seu preço médio. Quem for te presentear poderá selecionar uma ou várias. O valor mínimo combinado para a brincadeira é de R$ <span id="form-minimum-value">70,00</span>.</div>
+        </div>
+
+        <div class="form-field">
+          <label for="participant-comment">Observações gerais <span class="optional">(opcional)</span></label>
+          <textarea id="participant-comment" name="comment" rows="3" maxlength="700" placeholder="Alguma preferência, detalhe ou algo que você não gostaria de ganhar?"></textarea>
+        </div>
+
+        <p class="privacy-note"><span aria-hidden="true">ⓘ</span> Sua lista e sua foto serão visíveis para quem acessar o site. O aplicativo não registra nem mostra quem abriu cada lista. Somente você poderá editar seu cadastro usando a chave salva neste navegador. A hospedagem ainda pode manter registros técnicos próprios.</p>
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+        <div class="form-actions">
+          <button class="secondary-button" id="cancel-form-button" type="button">Cancelar</button>
+          <button class="primary-button submit-button" id="submit-button" type="submit">Confirmar participação <span aria-hidden="true">↗</span></button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <dialog class="modal friend-modal" id="friend-modal" aria-labelledby="friend-title">
+    <div class="modal-shell">
+      <div class="modal-header">
+        <div class="friend-heading">
+          <p class="section-kicker">LISTA DE DESEJOS</p>
+          <h2 id="friend-title">Presentes</h2>
+          <p class="modal-intro" id="friend-intro">Escolha um ou mais itens para somar os preços médios.</p>
+        </div>
+        <button class="close-button" id="close-friend-button" type="button" aria-label="Fechar lista">×</button>
+      </div>
+      <div id="friend-content" class="friend-content"></div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
