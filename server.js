@@ -4,7 +4,7 @@ const ROOT=path.join(__dirname,"public"),PORT=process.env.PORT||3000;
 const mime={".html":"text/html; charset=utf-8",".js":"text/javascript; charset=utf-8",".css":"text/css; charset=utf-8",".json":"application/json",".svg":"image/svg+xml",".png":"image/png",".jpg":"image/jpeg",".jpeg":"image/jpeg",".webp":"image/webp",".gif":"image/gif"};
 function config(){
  const e=n=>(process.env[n]||"").trim().replace(/^(["'])(.*)\1$/, "$2");
- const firebase={apiKey:e("FIREBASE_API_KEY"),authDomain:e("FIREBASE_AUTH_DOMAIN"),projectId:e("FIREBASE_PROJECT_ID"),storageBucket:e("FIREBASE_STORAGE_BUCKET"),messagingSenderId:e("FIREBASE_MESSAGING_SENDER_ID"),appId:e("FIREBASE_APP_ID")};
+ const firebase={apiKey:e("FIREBASE_API_KEY"),authDomain:e("FIREBASE_AUTH_DOMAIN"),projectId:e("FIREBASE_PROJECT_ID"),messagingSenderId:e("FIREBASE_MESSAGING_SENDER_ID"),appId:e("FIREBASE_APP_ID")};
  const out={};if(Object.values(firebase).every(Boolean))out.firebase=firebase;
  return "window.APP_CONFIG = "+JSON.stringify(out).replace(/</g,"\\u003c")+";\n";
 }

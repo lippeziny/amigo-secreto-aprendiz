@@ -2,18 +2,18 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /participants/{participantId} {
-      // A lista é pública para que qualquer participante consiga ver os desejos.
+      // As listas e fotos são públicas para que os participantes possam consultar os desejos.
       allow get, list: if true;
 
-      // Cada navegador recebe um UID anônimo. Só esse UID pode criar/alterar/apagar seu cadastro.
+      // O dono é identificado por uma sessão anônima persistida no navegador.
       allow create: if request.auth != null
         && request.resource.data.ownerUid == request.auth.uid
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0
         && request.resource.data.name.size() <= 60
-        && request.resource.data.items is list
-        && request.resource.data.items.size() >= 1
-        && request.resource.data.items.size() <= 20;
+        && request.resource.data.item_count is int
+        && request.resource.data.item_count >= 1
+        && request.resource.data.item_count <= 20;
 
       allow update: if request.auth != null
         && resource.data.ownerUid == request.auth.uid
@@ -21,12 +21,20 @@ service cloud.firestore {
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0
         && request.resource.data.name.size() <= 60
-        && request.resource.data.items is list
-        && request.resource.data.items.size() >= 1
-        && request.resource.data.items.size() <= 20;
+        && request.resource.data.item_count is int
+        && request.resource.data.item_count >= 1
+        && request.resource.data.item_count <= 20;
 
       allow delete: if request.auth != null
         && resource.data.ownerUid == request.auth.uid;
+
+      // Cada presente fica em um documento próprio. As imagens Base64 também ficam aqui.
+      // getAfter permite criar o documento do participante e seus presentes no mesmo batch.
+      match /items/{itemId} {
+        allow get, list: if true;
+        allow create, update, delete: if request.auth != null
+          && getAfter(/databases/$(database)/documents/participants/$(participantId)).data.ownerUid == request.auth.uid;
+      }
     }
   }
 }

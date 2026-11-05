@@ -53,6 +53,11 @@ function createElement(tag, className, text) {
   return element;
 }
 
+function photoSource(photo) {
+  if (typeof photo === 'string') return photo;
+  return photo?.data || photo?.url || '';
+}
+
 function appendProfileAvatar(container, person, className = 'avatar') {
   const avatar = createElement('div', className);
   if (person.profile_photo_url) {
@@ -128,10 +133,7 @@ async function loadParticipants() {
     const message = createElement('div', 'empty-state');
     message.append(createElement('div', 'empty-icon', '!'));
     message.append(createElement('h3', '', 'Não foi possível conectar ao Firebase'));
-    let detail = error?.code ? `${error.code}: ${error.message || ""}` : (error?.message || "Confira as configurações do Firebase e tente novamente.");
-    if (error?.code === 'permission-denied') {
-      detail = 'O Firebase está conectado, mas o Firestore está bloqueando a leitura dos participantes. No Console do Firebase do mesmo projeto indicado por FIREBASE_PROJECT_ID, abra Firestore Database → Rules, cole o conteúdo do arquivo firestore.rules deste ZIP e clique em Publicar. Autorizar o domínio em Authentication não libera o banco de dados.';
-    }
+    const detail = error?.code ? `${error.code}: ${error.message || ""}` : (error?.message || "Confira as configurações do Firebase e tente novamente.");
     message.append(createElement('p', '', detail));
     grid.append(message);
   } finally { grid.removeAttribute('aria-busy'); }
@@ -309,7 +311,7 @@ function addItemEditor(item = {}) {
     item.images.forEach((photo) => {
       const wrapper = createElement('div', 'preview-item');
       const image = document.createElement('img');
-      image.src = photo.url;
+      image.src = photoSource(photo);
       image.alt = 'Foto de produto já cadastrada';
       wrapper.append(image);
       thumbs.append(wrapper);
@@ -421,12 +423,12 @@ function renderFriendProfile(person) {
       const gallery = createElement('div', 'gift-choice-images');
       item.images.forEach((photo, index) => {
         const link = createElement('a', 'card-image');
-        link.href = photo.url;
+        link.href = photoSource(photo);
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
         link.setAttribute('aria-label', `Abrir foto ${index + 1} do produto`);
         const image = document.createElement('img');
-        image.src = photo.url;
+        image.src = photoSource(photo);
         image.alt = `Foto do presente ${Number(item.position) + 1}`;
         image.loading = 'lazy';
         link.append(image);
@@ -607,10 +609,7 @@ form.addEventListener('submit', async (event) => {
     showToast(message);
     document.getElementById('participantes').scrollIntoView({ behavior: 'smooth' });
   } catch (error) {
-    const detail = error?.code === 'permission-denied'
-      ? 'O Firebase recusou a gravação. Confira se Authentication → Sign-in method → Anonymous está ativado e publique também os arquivos firestore.rules (Firestore Database → Rules) e storage.rules (Storage → Rules) deste projeto.'
-      : (error.message || 'Não foi possível concluir seu cadastro. Tente novamente.');
-    showError(detail);
+    showError(error.message || 'Não foi possível concluir seu cadastro. Tente novamente.');
   } finally {
     submitButton.disabled = false;
     submitButton.innerHTML = editParticipantId ? 'Salvar alterações <span aria-hidden="true">↗</span>' : 'Confirmar participação <span aria-hidden="true">↗</span>';

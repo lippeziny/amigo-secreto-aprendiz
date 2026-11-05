@@ -13,8 +13,6 @@ services:
         sync: false
       - key: FIREBASE_PROJECT_ID
         sync: false
-      - key: FIREBASE_STORAGE_BUCKET
-        sync: false
       - key: FIREBASE_MESSAGING_SENDER_ID
         sync: false
       - key: FIREBASE_APP_ID
